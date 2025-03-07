@@ -23,7 +23,7 @@ function Lista() {
     const fetchFormulario = async () => {
       console.log('Buscando lista de registros do formulário da API');
       try {
-        const response = await axios.get('http://localhost:3000/formulario');
+        const response = await axios.get('http://127.0.0.1:3333/formulario/todos');
         setFormularios(response.data);
       } catch (err) {
         setError(err.response?.data?.error || 'Erro ao buscar dados.');

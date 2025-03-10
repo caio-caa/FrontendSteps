@@ -11,27 +11,48 @@ function Step1() {
   const [linkedin, setLinkedin] = useState('');
   const [anoFundacao, setAnoFundacao] = useState('');
   const [cidade, setCidade] = useState('');
-  const usuarioId = 1; // Supondo que esse ID venha do contexto de autenticação
+  const [usuarioId, setUsuarioId] = useState(null);
 
-  // 🔹 Ao montar o componente, verifica o último step salvo
+  // 🔹 Verifica o último step salvo ao montar o componente
   useEffect(() => {
-    const lastStep = localStorage.getItem(`user_${usuarioId}_lastStep`);
-    if (lastStep && parseInt(lastStep) !== 1) {
-      navigate(`/Step${lastStep}`); // Redireciona para o último step salvo
+    const storedUsuarioId = localStorage.getItem('usuario_id'); // Recupera o ID do usuário do localStorage
+    if (storedUsuarioId) {
+      setUsuarioId(storedUsuarioId); // Define o ID do usuário
+    } else {
+      // Se não houver um ID no localStorage, pode redirecionar ou definir um valor padrão
+      navigate('/login'); // Exemplo de redirecionamento
     }
-  }, [navigate, usuarioId]);
+
+    const lastStep = localStorage.getItem(`user_${storedUsuarioId}_lastStep`);
+    if (lastStep && parseInt(lastStep) !== 1) {
+      navigate(`/Step${lastStep}`);
+    }
+  }, [navigate]);
+
+  // 🔹 Função para obter o token salvo no localStorage
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
 
   // 🔹 Função para salvar os dados do Step 1 no backend
   const sendStep1Data = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:3333/formulario/save-step1', {
-        nome,
-        site,
-        linkedin,
-        ano_fundacao: anoFundacao.split('-')[0],
-        cidade,
-        usuario_id: usuarioId
-      });
+      const token = getToken(); // Obtém o token salvo no localStorage
+
+      const response = await axios.post(
+        'http://127.0.0.1:3333/formulario/save-step1',
+        {
+          nome,
+          site,
+          linkedin,
+          ano_fundacao: anoFundacao.split('-')[0], // Certifique-se que 'anoFundacao' é uma data válida
+          cidade,
+          usuario_id: usuarioId
+        },
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}, // Adiciona o token ao cabeçalho se existir
+        }
+      );
 
       if (response.status === 200) {
         console.log('Dados enviados com sucesso:', response.data);
@@ -45,9 +66,14 @@ function Step1() {
   const nextStep = async () => {
     await sendStep1Data();
     const newStep = step + 1;
-    localStorage.setItem(`user_${usuarioId}_lastStep`, newStep); // Salva o step no localStorage
-    navigate(`/Step${newStep}`); // Redireciona para o próximo step
+    localStorage.setItem(`user_${usuarioId}_lastStep`, newStep);
+    navigate(`/Step${newStep}`);
   };
+
+  if (!usuarioId) {
+    // Caso o usuário ainda não tenha o ID, pode renderizar um carregando ou nada até obter o ID.
+    return <div>Carregando...</div>;
+  }
 
   return (
     <Box height="10vh">
@@ -88,8 +114,33 @@ function Step1() {
             <Box width="100%">
               <FormLabel>Cidade onde a startup está localizada</FormLabel>
               <Select id="cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} placeholder='Selecione uma opção'>
-                <option value='AC'>AC</option>
-                <option value='AL'>AL</option>
+              <option value='AC'>AC</option>
+                    <option value='AL'>AL</option>
+                    <option value='AP'>AP</option>
+                    <option value='AM'>AM</option>
+                    <option value='BA'>BA</option>
+                    <option value='CE'>CE</option>
+                    <option value='DF'>DF</option>
+                    <option value='ES'>ES</option>
+                    <option value='GO'>GO</option>
+                    <option value='MA'>MA</option>
+                    <option value='MT'>MT</option>
+                    <option value='MS'>MS</option>
+                    <option value='MG'>MG</option>
+                    <option value='PA'>PA</option>
+                    <option value='PB'>PB</option>
+                    <option value='PR'>PR</option>
+                    <option value='PE'>PE</option>
+                    <option value='PI'>PI</option>
+                    <option value='RJ'>RJ</option>
+                    <option value='RN'>RN</option>
+                    <option value='RS'>RS</option>
+                    <option value='RO'>RO</option>
+                    <option value='RR'>RR</option>
+                    <option value='SC'>SC</option>
+                    <option value='SP'>SP</option>
+                    <option value='SE'>SE</option>
+                    <option value='TO'>TO</option>
               </Select>
             </Box>
           </HStack>

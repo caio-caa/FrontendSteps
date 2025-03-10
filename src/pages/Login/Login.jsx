@@ -11,17 +11,16 @@ import {
   InputRightElement,
   IconButton,
   Heading,
-  Flex,
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-import { useNavigate } from 'react-router-dom'; // Importe o useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // Instanciando o hook para navegação
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,23 +29,23 @@ const LoginPage = () => {
     try {
       const response = await fetch('http://127.0.0.1:3333/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password: senha }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Salvar o token de autenticação no localStorage
+        // ✅ Salva token e ID do usuário no localStorage
         localStorage.setItem('token', data.token);
+        localStorage.setItem('usuario_id', data.userId);
 
         setMessage('Login bem-sucedido!');
         console.log('Token recebido:', data.token);
+        console.log('Usuário ID:', data.userId);
 
-        // Redirecionar para a página Step1 após o login
-        navigate('/Step1'); // Navegação para o Step1
+        // ✅ Redireciona após salvar os dados
+        navigate('/Step1');
       } else {
         setMessage(data.error || 'Erro ao fazer login');
         console.error('Erro na resposta do servidor:', data);
@@ -60,16 +59,10 @@ const LoginPage = () => {
   return (
     <Box bg="#072AC8" minH="100vh" py={10} display="flex" justifyContent="center" alignItems="center">
       <Container maxW="lg">
-        <Box
-          bg="whiteAlpha.300"
-          p={8}
-          borderRadius="20"
-          boxShadow="lg"
-          backdropFilter="blur(10px)"
-        >
+        <Box bg="whiteAlpha.300" p={8} borderRadius="20" boxShadow="lg" backdropFilter="blur(10px)">
           <VStack spacing={8}>
             <Heading color="white" mb={6} textAlign="center" fontSize="28">
-              Acesse o sistemaa
+              Acesse o sistema
             </Heading>
 
             <InputGroup>
@@ -130,12 +123,7 @@ const LoginPage = () => {
 
             <Text color="white" mt={4} textAlign="center">
               Não tem uma conta?{' '}
-              <Link
-                href="#"
-                color="white"
-                fontWeight="bold"
-                _hover={{ textDecoration: 'underline' }}
-              >
+              <Link href="#" color="white" fontWeight="bold" _hover={{ textDecoration: 'underline' }}>
                 Cadastre-se
               </Link>
             </Text>

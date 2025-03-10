@@ -23,6 +23,12 @@ function Step8() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const usuarioId = localStorage.getItem('usuario_id') || 1;
+
+
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
 
   useEffect(() => {
     const currentStep = localStorage.getItem('currentStep');
@@ -52,19 +58,27 @@ function Step8() {
   const submitStep8Data = async () => {
     setLoading(true);
     try {
+      const token = getToken(); // Obtém o token salvo no localStorage
+
       const data = {
-        usuario_id: 1,
+        usuario_id: usuarioId,
         valuation,
         cap_table_socios: capTableSocios,
         estrategia_saida: estrategiaSaida,
         alocacao_recursos: alocacaoRecursos,
         pitch_link: pitchLink,
       };
+
       console.log('Enviando os dados do Step 8:', data);
-      const response = await axios.post('http://127.0.0.1:3333/formulario/step8', data);
+
+      // Envia os dados para o backend
+      const response = await axios.post('http://127.0.0.1:3333/formulario/step8', data, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
       console.log('Dados enviados com sucesso:', response.data);
-      localStorage.setItem('currentStep', 9);
-      navigate('/Step9');
+      localStorage.setItem('currentStep', 9); // Atualiza o step no localStorage
+      navigate('/Step9'); // Avança para o próximo passo
     } catch (error) {
       console.error('Erro ao enviar os dados:', error);
       alert('Erro ao enviar os dados. Verifique sua conexão e tente novamente.');

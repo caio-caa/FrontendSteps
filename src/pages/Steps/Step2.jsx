@@ -7,32 +7,52 @@ import axios from 'axios';
 
 function Step2() {
   const navigate = useNavigate();
-  const usuarioId = 1; // Supondo que esse ID venha do contexto de autenticação
   const [modeloNegocio, setModeloNegocio] = useState([]);
   const [verticalAtuacao, setVerticalAtuacao] = useState([]);
   const [problema, setProblema] = useState('');
   const [solucao, setSolucao] = useState('');
   const [outroModelo, setOutroModelo] = useState('');
   const [outroVertical, setOutroVertical] = useState('');
+  const [usuarioId, setUsuarioId] = useState(null);
 
-  // 🔹 Verifica o último step salvo e redireciona o usuário
+  // 🔹 Verifica o ID do usuário e o último step salvo
   useEffect(() => {
-    const lastStep = localStorage.getItem(`user_${usuarioId}_lastStep`);
+    const storedUsuarioId = localStorage.getItem('usuario_id');
+    if (storedUsuarioId) {
+      setUsuarioId(storedUsuarioId); // Define o ID do usuário
+    } else {
+      navigate('/login'); // Se não houver ID, redireciona para a página de login
+    }
+
+    const lastStep = localStorage.getItem(`user_${storedUsuarioId}_lastStep`);
     if (lastStep && parseInt(lastStep) !== 2) {
       navigate(`/Step${lastStep}`);
     }
-  }, [navigate, usuarioId]);
+  }, [navigate]);
+
+  // 🔹 Função para obter o token salvo no localStorage
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
 
   // 🔹 Salva os dados no backend e avança para o próximo step
   const nextStep = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:3333/steps/2', {
-        modelo_negocio: modeloNegocio.includes('Outro') ? [...modeloNegocio, outroModelo] : modeloNegocio,
-        vertical_atuacao: verticalAtuacao.includes('Outro') ? [...verticalAtuacao, outroVertical] : verticalAtuacao,
-        problema,
-        solucao,
-        usuario_id: usuarioId
-      });
+      const token = getToken(); // Obtém o token do localStorage
+
+      const response = await axios.post(
+        'http://127.0.0.1:3333/steps/2',
+        {
+          modelo_negocio: modeloNegocio.includes('Outro') ? [...modeloNegocio, outroModelo] : modeloNegocio,
+          vertical_atuacao: verticalAtuacao.includes('Outro') ? [...verticalAtuacao, outroVertical] : verticalAtuacao,
+          problema,
+          solucao,
+          usuario_id: usuarioId
+        },
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}, // Adiciona o token no cabeçalho
+        }
+      );
 
       console.log(response.data);
       
@@ -50,6 +70,11 @@ function Step2() {
     localStorage.setItem(`user_${usuarioId}_lastStep`, 1);
     navigate('/Step1');
   };
+
+  if (!usuarioId) {
+    // Caso o usuário ainda não tenha o ID, pode renderizar um carregando ou nada até obter o ID.
+    return <div>Carregando...</div>;
+  }
 
   return (
     <Box height="10vh">

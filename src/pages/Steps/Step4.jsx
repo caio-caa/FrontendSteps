@@ -14,54 +14,59 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function Step4({ usuario_id }) {
-  // Variáveis de estado para step 4
+function Step4() {
   const [estrategiaAquisicao, setEstrategiaAquisicao] = useState('');
   const [baseClientes, setBaseClientes] = useState('');
   const [planoCrescimento, setPlanoCrescimento] = useState('');
   const [maiorDesafio, setMaiorDesafio] = useState('');
-  const [step, setStep] = useState(4);
-
   const navigate = useNavigate();
+  const usuarioId = localStorage.getItem('usuario_id') || 1; // Recupera o ID do usuário
 
   useEffect(() => {
-    const currentStep = localStorage.getItem('currentStep');
+    const currentStep = localStorage.getItem('user_' + usuarioId + '_lastStep');
     if (currentStep && Number(currentStep) > 4) {
       navigate(`/Step${currentStep}`);
     }
 
-    // Preencher os campos com os dados do localStorage se existir
-    const step3Data = JSON.parse(localStorage.getItem('step3Data')) || {};
-    setEstrategiaAquisicao(step3Data.estrategia_aquisicao || '');
-    setBaseClientes(step3Data.base_clientes || '');
-    setPlanoCrescimento(step3Data.plano_crescimento || '');
-    setMaiorDesafio(step3Data.maior_desafio || '');
-  }, []);
+    // Preencher os campos com os dados do localStorage se existirem
+    const step4Data = JSON.parse(localStorage.getItem('step4Data')) || {};
+    setEstrategiaAquisicao(step4Data.estrategia_aquisicao || '');
+    setBaseClientes(step4Data.base_clientes || '');
+    setPlanoCrescimento(step4Data.plano_crescimento || '');
+    setMaiorDesafio(step4Data.maior_desafio || '');
+  }, [usuarioId, navigate]);
 
   const nextStep = async () => {
     try {
+      const token = localStorage.getItem('token'); // Recupera o token JWT
       const data = {
-        usuario_id: 1,
+        usuario_id: usuarioId,
         estrategia_aquisicao: estrategiaAquisicao,
         base_clientes: baseClientes,
         plano_crescimento: planoCrescimento,
         maior_desafio: maiorDesafio,
       };
-      console.log('Dados a serem enviados:', data);
+
+      console.log('Enviando dados:', data);
       
-      // Salvar os dados no localStorage antes de avançar
+      // Salva os dados no localStorage
       localStorage.setItem('step4Data', JSON.stringify(data));
 
-      const response = await axios.post('http://127.0.0.1:3333/steps/step4', data);
+      const response = await axios.post('http://127.0.0.1:3333/steps/step4', data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       console.log(response.data);
-      localStorage.setItem('currentStep', 5);  // Salvar o próximo passo no localStorage
+      localStorage.setItem('user_' + usuarioId + '_lastStep', 5);
       navigate('/Step5');
     } catch (error) {
       console.error('Erro ao salvar Step 4:', error.response ? error.response.data : error);
+      alert('Erro ao salvar os dados. Verifique sua conexão e tente novamente.');
     }
   };
 
   const prevStep = () => {
+    localStorage.setItem('user_' + usuarioId + '_lastStep', 3);
     navigate('/Step3');
   };
 
@@ -70,9 +75,8 @@ function Step4({ usuario_id }) {
       <Center
         as="header"
         height={176}
-        bg="teal.500"
+        bg="#072AC8"
         color="white"
-        backgroundColor={'#072AC8'}
         fontWeight="bold"
         fontSize="4xl"
         paddingBottom="8"
@@ -113,7 +117,9 @@ function Step4({ usuario_id }) {
                 onChange={(e) => setBaseClientes(e.target.value)}
               >
                 {[...Array(10)].map((_, i) => (
-                  <option key={i} value={`${i * 10 + 1} à ${(i + 1) * 10}`}>{`${i * 10 + 1} à ${(i + 1) * 10}`}</option>
+                  <option key={i} value={`${i * 10 + 1} à ${(i + 1) * 10}`}>
+                    {`${i * 10 + 1} à ${(i + 1) * 10}`}
+                  </option>
                 ))}
                 <option value="+100">+100</option>
               </Select>
@@ -138,10 +144,18 @@ function Step4({ usuario_id }) {
             </Box>
 
             <HStack spacing="4">
-              <Button marginTop={4} colorScheme="teal" onClick={prevStep} bg="blue" color="white" _hover={{ bg: "white", color: "blue", border: "2px solid blue" }}>
+              <Button
+                marginTop={4}
+                colorScheme="blue"
+                onClick={prevStep}
+              >
                 Anterior
               </Button>
-              <Button marginTop={4} colorScheme="teal" onClick={nextStep} bg="blue" color="white" _hover={{ bg: "white", color: "blue", border: "2px solid blue" }}>
+              <Button
+                marginTop={4}
+                colorScheme="blue"
+                onClick={nextStep}
+              >
                 Próximo
               </Button>
             </HStack>

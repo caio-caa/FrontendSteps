@@ -20,6 +20,7 @@ function Step6() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const usuarioId = localStorage.getItem('usuario_id') || 1; // Recupera o ID do usuário
 
   useEffect(() => {
     const currentStep = localStorage.getItem('currentStep');
@@ -27,7 +28,7 @@ function Step6() {
       navigate(`/Step${currentStep}`);
     }
     focusLastField();
-  }, []);
+  }, [navigate]);
 
   const handleFocus = (event) => {
     const id = event.target.id;
@@ -49,18 +50,22 @@ function Step6() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem('token'); // Recupera o token JWT
       const data = {
-        usuario_id: 1, // Substituir pelo ID real do usuário
+        usuario_id: usuarioId,
         tam_sam_som: mercado,
         concorrentes,
       };
 
-      console.log('Dados a serem enviados:', data);
-      const response = await axios.post('http://127.0.0.1:3333/formulario/step6', data);
+      console.log('Enviando dados:', data);
+
+      const response = await axios.post('http://127.0.0.1:3333/formulario/step6', data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       console.log('Step 6 salvo com sucesso:', response.data);
-      
-      localStorage.setItem('currentStep', 7); // Atualiza o step no localStorage
-      navigate('/Step7'); // Avança para o próximo passo
+      localStorage.setItem('currentStep', 7);
+      navigate('/Step7');
     } catch (error) {
       console.error('Erro ao salvar Step 6:', error.response?.data || error.message);
       alert('Erro ao enviar os dados. Verifique sua conexão e tente novamente.');
@@ -78,9 +83,8 @@ function Step6() {
       <Center
         as="header"
         height={176}
-        bg="teal.500"
+        bg="#072AC8"
         color="white"
-        backgroundColor="#072AC8"
         fontWeight="bold"
         fontSize="4xl"
         paddingBottom="8"

@@ -22,6 +22,7 @@ function Step5() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const usuarioId = localStorage.getItem('usuario_id') || 1; // Recupera o ID do usuário
 
   useEffect(() => {
     const currentStep = localStorage.getItem('currentStep');
@@ -29,7 +30,7 @@ function Step5() {
       navigate(`/Step${currentStep}`);
     }
     focusLastField();
-  }, []);
+  }, [navigate]);
 
   const handleFocus = (event) => {
     const id = event.target.id;
@@ -59,18 +60,28 @@ function Step5() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem('token'); // Recupera o token JWT
       const data = {
-        usuario_id: 1,
+        usuario_id: usuarioId,
         tecnologias,
-        impacto_tecnologias: impactoTecnologias,
+        impacto_gateway_pagamento: impactoTecnologias[0],
+        impacto_realidade_aumentada: impactoTecnologias[1],
+        impacto_analise_dados: impactoTecnologias[2],
+        impacto_ia: impactoTecnologias[3],
+        impacto_blockchain: impactoTecnologias[4],
+        impacto_cripto: impactoTecnologias[5],
+        impacto_tokenizacao: impactoTecnologias[6],
       };
 
-      console.log('Dados a serem enviados:', data);
-      const response = await axios.post('http://127.0.0.1:3333/steps/step5', data);
+      console.log('Enviando dados:', data);
+
+      const response = await axios.post('http://127.0.0.1:3333/steps/step5', data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       console.log('Step 5 salvo com sucesso:', response.data);
-      
-      localStorage.setItem('currentStep', 6); // Atualiza o step
-      navigate('/Step6'); // Avança para o próximo passo
+      localStorage.setItem('currentStep', 6);
+      navigate('/Step6');
     } catch (error) {
       console.error('Erro ao salvar Step 5:', error.response?.data || error.message);
       alert('Erro ao enviar os dados. Verifique sua conexão e tente novamente.');
@@ -88,9 +99,8 @@ function Step5() {
       <Center
         as="header"
         height={176}
-        bg="teal.500"
+        bg="#072AC8"
         color="white"
-        backgroundColor="#072AC8"
         fontWeight="bold"
         fontSize="4xl"
         paddingBottom="8"

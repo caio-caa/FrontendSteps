@@ -53,7 +53,6 @@ function InvestorReportView({ id, onBack }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Função para buscar os dados da API
   const fetchReportData = async (id) => {
     if (!id) {
       setError('ID inválido. Não é possível buscar dados.');
@@ -61,13 +60,12 @@ function InvestorReportView({ id, onBack }) {
     }
 
     try {
-      const response = await axios.get(`http://127.0.0.1:3333/formulario/todos/${id}`);
-
+      const response = await axios.get(`http://localhost:3000/formulario/${id}`);
       console.log('Resposta da API:', response.data);
       if (response.data) {
         setDados(response.data);
       } else {
-        setError('Nenhum dado encontrado.');
+        setError('Nenhum dado encontrado para este ID.');
       }
     } catch (err) {
       console.error('Erro na API:', err.response?.data?.error || err.message);
@@ -87,11 +85,19 @@ function InvestorReportView({ id, onBack }) {
 
   const handleBack = () => {
     if (onBack) {
-      onBack(); // Usa a função onBack se fornecida
+      onBack();
     } else {
-      navigate('/lista'); // Caso contrário, volta para a rota padrão
+      navigate('/lista');
     }
   };
+
+  if (error) {
+    return <Box p={4} color="red.500">{error}</Box>;
+  }
+
+  if (!dados) {
+    return <Box p={4}>Carregando...</Box>;
+  }
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" bg="gray.50">

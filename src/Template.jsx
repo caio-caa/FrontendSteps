@@ -49,17 +49,17 @@ function Template({ id, onBack }) {
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" bg="gray.50">
-      <Box 
-        p={4} 
-        bg="white" 
-        width="210mm" 
-        height="297mm" 
-        border="1px solid gray" 
-        display="flex" 
-        flexDirection="column" 
-        overflowY="auto" 
+      <Box
+        p={4}
+        bg="white"
+        width="210mm"
+        height="298mm"
+        border="1px solid gray"
+        display="flex"
+        flexDirection="column"
+        overflowY="auto"
       >
-        <Flex gap={4} mb={4} display={{ base: "flex", print: "none" }}> 
+        <Flex gap={4} mb={4} display={{ base: "flex", print: "none" }}>
           <Button onClick={onBack} colorScheme="blue" mr={2}>Voltar</Button>
           <Button onClick={handlePrint} colorScheme="blue">Imprimir</Button>
         </Flex>
@@ -134,6 +134,10 @@ function Template({ id, onBack }) {
             <Box>
               <Text fontSize="md" fontWeight="bold" mb={2} color="#072AC8">VERTICAL DE ATUAÇÃO</Text>
               <Box bg="gray.200" p={2} borderRadius="md">{dados.vertical_atuacao || 'N/A'}</Box>
+            </Box>
+
+            <Box>
+            <Text bottom={2} right={2} fontSize="sm"  color="gray.500" whiteSpace="nowrap">Gerado de acordo com as informações fornecidas | by Loor.vc</Text>
             </Box>
           </Flex>
         </Grid>

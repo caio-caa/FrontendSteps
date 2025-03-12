@@ -30,7 +30,46 @@ import axios from 'axios';
 function App() {
   const [nome, setNome] = useState('');
   const [step, setStep] = useState(9);
+  const [status, setStatus] = useState('Enviado');
+  const usuarioId = localStorage.getItem('usuario_id') || 1; // Recupera o ID do usuário como no Step5
 
+  useEffect(() => {
+    console.log('ID do usuário recuperado:', usuarioId);
+  }, [usuarioId]);
+
+  // Função para atualizar o status
+  const atualizarStatus = async (novoStatus) => {
+    try {
+      const response = await axios.put(`http://127.0.0.1:3333/status/${usuarioId}`, {
+        status: novoStatus
+      });
+      
+      if (response.status === 200) {
+        setStatus(novoStatus);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+    }
+  };
+
+  // Efeito para buscar e inicializar o status
+  useEffect(() => {
+    const buscarStatus = async () => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:3333/status/${usuarioId}`);
+        if (response.data && response.data.status) {
+          setStatus(response.data.status);
+          console.log('Status atual do formulário:', response.data.status);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar status:', error);
+        // Em caso de erro, mantém o status padrão como 'Enviado'
+        setStatus('Enviado');
+      }
+    };
+
+    buscarStatus();
+  }, [usuarioId]);
 
   return (
     <Box height="10vh">
@@ -90,12 +129,38 @@ function App() {
                   <Flex justifyContent="space-between" alignItems="center">
                     {['Enviado', 'Em análise', 'Concluído'].map((statusName, index) => (
                       <React.Fragment key={statusName}>
-                        {index !== 0 && <Box flex="1" height="2px" bg="gray.300" mx={2}></Box>}
+                        {index !== 0 && (
+                          <Box 
+                            flex="1" 
+                            height="2px" 
+                            bg={status === statusName || 
+                                ['Enviado', 'Em análise', 'Concluído']
+                                  .indexOf(status) > ['Enviado', 'Em análise', 'Concluído']
+                                  .indexOf(statusName) 
+                              ? "#072AC8" 
+                              : "gray.300"} 
+                            mx={2}
+                          />
+                        )}
                         <Flex direction="column" alignItems="center">
-                          <Circle size="40px" bg="gray.300" color="white">
-                            {status === statusName ? <CheckIcon color="white" /> : <Text color="white" fontSize="sm">{index + 1}</Text>}
+                          <Circle 
+                            size="40px" 
+                            bg={status === statusName ? "#072AC8" : "gray.300"} 
+                            color="white"
+                          >
+                            {status === statusName || 
+                             ['Enviado', 'Em análise', 'Concluído']
+                               .indexOf(status) > ['Enviado', 'Em análise', 'Concluído']
+                               .indexOf(statusName) 
+                              ? <CheckIcon color="white" /> 
+                              : <Text color="white" fontSize="sm">{index + 1}</Text>}
                           </Circle>
-                          <Text mt={2} fontSize="sm" fontWeight="bold" color="gray.300">
+                          <Text 
+                            mt={2} 
+                            fontSize="sm" 
+                            fontWeight="bold" 
+                            color={status === statusName ? "#072AC8" : "gray.300"}
+                          >
                             {statusName}
                           </Text>
                         </Flex>

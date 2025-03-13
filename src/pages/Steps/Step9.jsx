@@ -26,6 +26,7 @@ import { CheckIcon } from '@chakra-ui/icons';
 import { FaWhatsapp, FaLinkedin, FaInstagramSquare } from 'react-icons/fa';
 import axios from 'axios';
 import Template from '../../Template';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -35,11 +36,13 @@ function App() {
   const [status, setStatus] = useState('Enviado');
   const [error, setError] = useState(null);
   const usuarioId = localStorage.getItem('usuario_id') || 1; // Recupera o ID do usuário como no Step5
- const [selectedId, setSelectedId] = useState(null);
- const handleVerMais = (usuarioId) => {
+  const [selectedId, setSelectedId] = useState(null);
+  const navigate = useNavigate();
+
+  const handleVerMais = (usuarioId) => {
     setSelectedId(Number(usuarioId));
   };
-  
+
   const handleBack = () => {
     setSelectedId(null);
   };
@@ -54,7 +57,7 @@ function App() {
       const response = await axios.put(`http://127.0.0.1:3333/status/${usuarioId}`, {
         status: novoStatus
       });
-      
+
       if (response.status === 200) {
         setStatus(novoStatus);
       }
@@ -82,7 +85,7 @@ function App() {
     buscarStatus();
   }, [usuarioId]);
   if (selectedId) {
-    
+
     return <Template id={selectedId} onBack={handleBack} />;
     console.log('ID do usuário sendo essssssssssssssssssssnviado:', selectedId);
   }
@@ -125,7 +128,7 @@ function App() {
           boxShadow="0 1px 2px #ccc"
         >
 
-          
+
 
 
           {step === 9 && (
@@ -145,35 +148,35 @@ function App() {
                     {['Enviado', 'Em análise', 'Concluído'].map((statusName, index) => (
                       <React.Fragment key={statusName}>
                         {index !== 0 && (
-                          <Box 
-                            flex="1" 
-                            height="2px" 
-                            bg={status === statusName || 
-                                ['Enviado', 'Em análise', 'Concluído']
-                                  .indexOf(status) > ['Enviado', 'Em análise', 'Concluído']
-                                  .indexOf(statusName) 
-                              ? "#072AC8" 
-                              : "gray.300"} 
+                          <Box
+                            flex="1"
+                            height="2px"
+                            bg={status === statusName ||
+                              ['Enviado', 'Em análise', 'Concluído']
+                                .indexOf(status) > ['Enviado', 'Em análise', 'Concluído']
+                                  .indexOf(statusName)
+                              ? "#072AC8"
+                              : "gray.300"}
                             mx={2}
                           />
                         )}
                         <Flex direction="column" alignItems="center">
-                          <Circle 
-                            size="40px" 
-                            bg={status === statusName ? "#072AC8" : "gray.300"} 
+                          <Circle
+                            size="40px"
+                            bg={status === statusName ? "#072AC8" : "gray.300"}
                             color="white"
                           >
-                            {status === statusName || 
-                             ['Enviado', 'Em análise', 'Concluído']
-                               .indexOf(status) > ['Enviado', 'Em análise', 'Concluído']
-                               .indexOf(statusName) 
-                              ? <CheckIcon color="white" /> 
+                            {status === statusName ||
+                              ['Enviado', 'Em análise', 'Concluído']
+                                .indexOf(status) > ['Enviado', 'Em análise', 'Concluído']
+                                  .indexOf(statusName)
+                              ? <CheckIcon color="white" />
                               : <Text color="white" fontSize="sm">{index + 1}</Text>}
                           </Circle>
-                          <Text 
-                            mt={2} 
-                            fontSize="sm" 
-                            fontWeight="bold" 
+                          <Text
+                            mt={2}
+                            fontSize="sm"
+                            fontWeight="bold"
                             color={status === statusName ? "#072AC8" : "gray.300"}
                           >
                             {statusName}
@@ -220,6 +223,7 @@ function App() {
                   {/* Investor Report e One Page lado a lado */}
                   <Flex direction="row">
                     <Button
+                      onClick={() => navigate('/report')}
                       bgGradient="linear(to-r, #072AC8, #1E90FF)"
                       color="white"
                       _hover={{

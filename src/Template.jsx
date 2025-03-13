@@ -69,6 +69,7 @@ function InvestorReportView({ id, onBack }) {
       if (item) {
         setDados(item);
       } else {
+        
         setError('Nenhum dado encontrado para este ID.');
       }
     } catch (err) {

@@ -142,7 +142,10 @@ function Lista() {
                           bg={'#072AC8'}
                           colorScheme="blue"
                           size="sm"
-                          onClick={() => handleVerMais(registro.id)}
+                          onClick={() => {
+                            console.log('Clicou em One Page, ID:', registro.id);
+                            handleVerMais(registro.id);
+                          }}
                         >
                           One Page
                         </Button>

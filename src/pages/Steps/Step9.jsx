@@ -25,13 +25,24 @@ import {
 import { CheckIcon } from '@chakra-ui/icons';
 import { FaWhatsapp, FaLinkedin, FaInstagramSquare } from 'react-icons/fa';
 import axios from 'axios';
+import Template from '../../Template';
+
 
 
 function App() {
   const [nome, setNome] = useState('');
   const [step, setStep] = useState(9);
   const [status, setStatus] = useState('Enviado');
+  const [error, setError] = useState(null);
   const usuarioId = localStorage.getItem('usuario_id') || 1; // Recupera o ID do usuário como no Step5
+ const [selectedId, setSelectedId] = useState(null);
+ const handleVerMais = (usuarioId) => {
+    setSelectedId(Number(usuarioId));
+  };
+  
+  const handleBack = () => {
+    setSelectedId(null);
+  };
 
   useEffect(() => {
     console.log('ID do usuário recuperado:', usuarioId);
@@ -70,7 +81,11 @@ function App() {
 
     buscarStatus();
   }, [usuarioId]);
-
+  if (selectedId) {
+    
+    return <Template id={selectedId} onBack={handleBack} />;
+    console.log('ID do usuário sendo essssssssssssssssssssnviado:', selectedId);
+  }
   return (
     <Box height="10vh">
       <Center
@@ -229,7 +244,10 @@ function App() {
                       px={20}
                       py={6}
                       ml={7}
-                      onClick={() => handleVerMais(registro.id)}
+                      onClick={() => {
+                        console.log('Clicou em Ler Mais', usuarioId);
+                        handleVerMais(usuarioId);
+                      }}
                     >
                       Gerar One Page
                     </Button>

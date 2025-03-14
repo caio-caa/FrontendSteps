@@ -29,8 +29,7 @@ const LoginPage = () => {
     try {
       const response = await fetch('http://127.0.0.1:3333/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: senha }),
+        headers: { 'Content-Type': 'application/json' }
       });
 
       const data = await response.json();

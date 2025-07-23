@@ -37,7 +37,10 @@ function Lista() {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await axios.put(`http://localhost:3000/formulario/${id}`, { status: newStatus });
+      // Corrigir a URL para usar /status/{id} no backend
+      await axios.put(`http://127.0.0.1:3333/status/${id}`, { status: newStatus });
+      
+      // Atualiza o estado local com o novo status
       setFormularios((prev) =>
         prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
       );
@@ -139,7 +142,10 @@ function Lista() {
                           bg={'#072AC8'}
                           colorScheme="blue"
                           size="sm"
-                          onClick={() => handleVerMais(registro.id)}
+                          onClick={() => {
+                            console.log('Clicou em One Page, ID:', registro.id);
+                            handleVerMais(registro.id);
+                          }}
                         >
                           One Page
                         </Button>

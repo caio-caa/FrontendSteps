@@ -25,13 +25,70 @@ import {
 import { CheckIcon } from '@chakra-ui/icons';
 import { FaWhatsapp, FaLinkedin, FaInstagramSquare } from 'react-icons/fa';
 import axios from 'axios';
+import Template from '../../Template';
+import { useNavigate } from 'react-router-dom';
+
 
 
 function App() {
   const [nome, setNome] = useState('');
   const [step, setStep] = useState(9);
+  const [status, setStatus] = useState('Enviado');
+  const [error, setError] = useState(null);
+  const usuarioId = localStorage.getItem('usuario_id') || 1; // Recupera o ID do usuário como no Step5
+  const [selectedId, setSelectedId] = useState(null);
+  const navigate = useNavigate();
 
+  const handleVerMais = (usuarioId) => {
+    setSelectedId(Number(usuarioId));
+  };
 
+  const handleBack = () => {
+    setSelectedId(null);
+  };
+
+  useEffect(() => {
+    console.log('ID do usuário recuperado:', usuarioId);
+  }, [usuarioId]);
+
+  // Função para atualizar o status
+  const atualizarStatus = async (novoStatus) => {
+    try {
+      const response = await axios.put(`http://127.0.0.1:3333/status/${usuarioId}`, {
+        status: novoStatus
+      });
+
+      if (response.status === 200) {
+        setStatus(novoStatus);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+    }
+  };
+
+  // Efeito para buscar e inicializar o status
+  useEffect(() => {
+    const buscarStatus = async () => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:3333/status/${usuarioId}`);
+        if (response.data && response.data.status) {
+          setStatus(response.data.status);
+          console.log('Status atual do formulário:', response.data.status);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar status:', error);
+        // Em caso de erro, mantém o status padrão como 'Enviado'
+        setStatus('Enviado');
+      }
+    };
+
+    buscarStatus();
+  }, [usuarioId]);
+  if (selectedId) {
+
+    return <Template id={selectedId} onBack={handleBack} />;
+    console.log('ID do usuário sendo essssssssssssssssssssnviado:', selectedId);
+  }
   return (
     <Box height="10vh">
       <Center
@@ -71,7 +128,7 @@ function App() {
           boxShadow="0 1px 2px #ccc"
         >
 
-          
+
 
 
           {step === 9 && (
@@ -90,12 +147,38 @@ function App() {
                   <Flex justifyContent="space-between" alignItems="center">
                     {['Enviado', 'Em análise', 'Concluído'].map((statusName, index) => (
                       <React.Fragment key={statusName}>
-                        {index !== 0 && <Box flex="1" height="2px" bg="gray.300" mx={2}></Box>}
+                        {index !== 0 && (
+                          <Box
+                            flex="1"
+                            height="2px"
+                            bg={status === statusName ||
+                              ['Enviado', 'Em análise', 'Concluído']
+                                .indexOf(status) > ['Enviado', 'Em análise', 'Concluído']
+                                  .indexOf(statusName)
+                              ? "#072AC8"
+                              : "gray.300"}
+                            mx={2}
+                          />
+                        )}
                         <Flex direction="column" alignItems="center">
-                          <Circle size="40px" bg="gray.300" color="white">
-                            {status === statusName ? <CheckIcon color="white" /> : <Text color="white" fontSize="sm">{index + 1}</Text>}
+                          <Circle
+                            size="40px"
+                            bg={status === statusName ? "#072AC8" : "gray.300"}
+                            color="white"
+                          >
+                            {status === statusName ||
+                              ['Enviado', 'Em análise', 'Concluído']
+                                .indexOf(status) > ['Enviado', 'Em análise', 'Concluído']
+                                  .indexOf(statusName)
+                              ? <CheckIcon color="white" />
+                              : <Text color="white" fontSize="sm">{index + 1}</Text>}
                           </Circle>
-                          <Text mt={2} fontSize="sm" fontWeight="bold" color="gray.300">
+                          <Text
+                            mt={2}
+                            fontSize="sm"
+                            fontWeight="bold"
+                            color={status === statusName ? "#072AC8" : "gray.300"}
+                          >
                             {statusName}
                           </Text>
                         </Flex>
@@ -140,6 +223,7 @@ function App() {
                   {/* Investor Report e One Page lado a lado */}
                   <Flex direction="row">
                     <Button
+                      onClick={() => navigate('/report')}
                       bgGradient="linear(to-r, #072AC8, #1E90FF)"
                       color="white"
                       _hover={{
@@ -164,7 +248,10 @@ function App() {
                       px={20}
                       py={6}
                       ml={7}
-                      onClick={() => handleVerMais(registro.id)}
+                      onClick={() => {
+                        console.log('Clicou em Ler Mais', usuarioId);
+                        handleVerMais(usuarioId);
+                      }}
                     >
                       Gerar One Page
                     </Button>

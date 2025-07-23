@@ -1,35 +1,76 @@
-import { Grid, Box, Text, Flex, Button } from '@chakra-ui/react';
+import { Grid, Box, Text, Flex, Button, Divider } from '@chakra-ui/react';
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function Template({ id, onBack }) { 
+function InvestorReportView({ id, onBack }) {
   const [dados, setDados] = useState({
     nome: '',
-    email: '',
-    telefone: '',
-    problema: '',
-    solucao: '',
-    proposta_valor: '',
-    tam_sam_som: '',
-    recebeu_investimento: '',
-    valor_ultima_capta: '',
-    mrr: '',
-    valuation: '',
-    ticket_medio: '',
-    qtd_colaboradores: '',
+    site: '',
+    linkedin: '',
+    ano_fundacao: '',
+    cidade: '',
     modelo_negocio: '',
     vertical_atuacao: '',
+    problema: '',
+    solucao: '',
+    cliente_ideal: '',
+    proposta_valor: '',
+    maturidade: '',
+    qtd_colaboradores: '',
+    estrategia_aquisicao: '',
+    base_clientes: '',
+    plano_crescimento: '',
+    maior_desafio: '',
+    tecnologias: '',
+    tam_sam_som: '',
+    concorrentes: '',
+    fonte_receita: '',
+    recebeu_investimento: '',
+    percentual_equity_disponivel: '',
+    impacto_gateway_pagamento: '',
+    impacto_realidade_aumentada: '',
+    impacto_analise_dados: '',
+    impacto_ia: '',
+    impacto_blockchain: '',
+    impacto_cripto: '',
+    impacto_tokenizacao: '',
+    investimentos_recebidos: '',
+    mrr: '',
+    valor_ultima_capta: '',
+    ticket_medio: '',
+    percentual_equity_negociado: '',
+    status_captacao_aberta: '',
+    valor_buscado: '',
+    valuation: '',
+    cap_table_socios: '',
+    estrategia_saida: '',
+    alocacao_recursos: '',
+    pitch_link: '',
+    valor_investimento: '',
   });
 
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const fetchFormData = async (id) => {
+  const fetchReportData = async (id) => {
+    if (!id) {
+      setError('ID inválido. Não é possível buscar dados.');
+      return;
+    }
+
     try {
-      const response = await axios.get(`http://localhost:3000/formulario/${id}`); 
-      if (response.data) {
-        setDados(response.data);
+      const response = await axios.get(`http://127.0.0.1:3333/formulario/todos`);
+      const data = response.data;
+      
+      // Encontrando o item específico pelo ID
+      const item = data.find(entry => entry.id === id);
+      
+      if (item) {
+        setDados(item);
       } else {
-        console.error('Nenhum dado retornado da API');
+        
+        setError('Nenhum dado encontrado para este ID.');
       }
     } catch (err) {
       console.error('Erro na API:', err.response?.data?.error || err.message);
@@ -39,7 +80,7 @@ function Template({ id, onBack }) {
 
   useEffect(() => {
     if (id) {
-      fetchFormData(id);
+      fetchReportData(id);
     }
   }, [id]);
 
@@ -47,19 +88,35 @@ function Template({ id, onBack }) {
     window.print();
   };
 
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate('/lista');
+    }
+  };
+
+  if (error) {
+    return <Box p={4} color="red.500">{error}</Box>;
+  }
+
+  if (!dados) {
+    return <Box p={4}>Carregando...</Box>;
+  }
+
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" bg="gray.50">
-      <Box 
-        p={4} 
-        bg="white" 
-        width="210mm" 
-        height="297mm" 
-        border="1px solid gray" 
-        display="flex" 
-        flexDirection="column" 
-        overflowY="auto" 
+      <Box
+        p={4}
+        bg="white"
+        width="210mm"
+        height="298mm"
+        border="1px solid gray"
+        display="flex"
+        flexDirection="column"
+        overflowY="auto"
       >
-        <Flex gap={4} mb={4} display={{ base: "flex", print: "none" }}> 
+        <Flex gap={4} mb={4} display={{ base: "flex", print: "none" }}>
           <Button onClick={onBack} colorScheme="blue" mr={2}>Voltar</Button>
           <Button onClick={handlePrint} colorScheme="blue">Imprimir</Button>
         </Flex>
@@ -135,6 +192,10 @@ function Template({ id, onBack }) {
               <Text fontSize="md" fontWeight="bold" mb={2} color="#072AC8">VERTICAL DE ATUAÇÃO</Text>
               <Box bg="gray.200" p={2} borderRadius="md">{dados.vertical_atuacao || 'N/A'}</Box>
             </Box>
+
+            <Box>
+            <Text bottom={2} right={2} fontSize="sm"  color="gray.500" whiteSpace="nowrap">Gerado de acordo com as informações fornecidas | by Loor.vc</Text>
+            </Box>
           </Flex>
         </Grid>
 
@@ -148,4 +209,4 @@ function Template({ id, onBack }) {
   );
 }
 
-export default Template;
+export default InvestorReportView;

@@ -6,12 +6,11 @@ import {
 import axios from 'axios';
 
 const StartupForm = () => {
-  const navigate = useNavigate(); // Usando o React Router para navegação
+  const navigate = useNavigate();
   const primaryColor = "#072AC8";
   const accentColor = "#2A9D8F";
   const backgroundColor = useColorModeValue("", "gray.700");
 
-  // Estado para capturar os dados
   const [nome, setNome] = useState('');
   const [responsavel, setResponsavel] = useState('');
   const [ano, setAno] = useState(new Date().getFullYear());
@@ -35,20 +34,22 @@ const StartupForm = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    // Recupera o ID do localStorage ao carregar o componente
-    const id = localStorage.getItem('form_id');
-    if (id) {
-      setUsuarioId(id);
+    if (typeof window !== "undefined") {
+      const id = localStorage.getItem('usuario_id');
+      console.log("ID do usuário recuperado:", id);
+      if (id) {
+        setUsuarioId(id);
+      }
     }
   }, []);
 
   const handleSubmit = async () => {
+    console.log("ID do usuário no envio:", usuarioId);
     if (!usuarioId) {
       alert("Usuário não identificado. Por favor, faça login.");
       return;
     }
 
-    // Validação simples
     if (!nome || !responsavel || !mes || !ano || !contato) {
       alert("Por favor, preencha todos os campos obrigatórios!");
       return;
@@ -76,45 +77,18 @@ const StartupForm = () => {
       ajuda,
       usuario_id: usuarioId,
     };
+    console.log("Dados sendo enviados:", data);
 
     try {
-      const response = await axios.post(`http://localhost:4000/api/submit/${usuarioId}`, data);
+      const response = await axios.post(`http://127.0.0.1:3333/investor-reports/save`, data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       if (response.status === 201) {
         setSuccessMessage("Formulário enviado com sucesso!");
-
-        const hoje = new Date();
-        const dataComMaisUmMes = new Date(hoje);
-        dataComMaisUmMes.setMonth(dataComMaisUmMes.getMonth() + 1);
-
-        const dia = String(dataComMaisUmMes.getDate()).padStart(2, '0');
-        const mes = String(dataComMaisUmMes.getMonth() + 1).padStart(2, '0');
-        const ano = String(dataComMaisUmMes.getFullYear()).slice(-2);
-
-        alert(`Formulario enviado com sucesso! \nPara mantermos os seus dados atualizados, responda esse investor report no dia: \n${dia}/${mes}/${ano} \n Anote na sua agenda!`);
-        window.history.back();
-
-        setTimeout(() => setSuccessMessage(''), 3000); // Limpa a mensagem após 3 segundos
-
-        // Limpa os campos
-        setNome('');
-        setResponsavel('');
-        setAno(new Date().getFullYear());
-        setMes('');
-        setContato('');
-        setMrr('');
-        setFaturamento('');
-        setDespesas('');
-        setCaixa('');
-        setCashBurn('');
-        setRunway('');
-        setValuation('');
-        setClientes('');
-        setCac('');
-        setChurn('');
-        setLtv('');
-        setBoasNoticias('');
-        setMasNoticias('');
-        setAjuda('');
+        alert("Formulário enviado com sucesso!");
+        navigate(-1);
       } else {
         alert("Houve um erro ao enviar o formulário.");
       }

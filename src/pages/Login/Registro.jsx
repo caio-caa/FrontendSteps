@@ -13,7 +13,7 @@ const Registro = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:2000/api/users/register', {
+      const response = await fetch('http://localhost:2000/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

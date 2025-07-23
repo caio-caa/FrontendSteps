@@ -14,7 +14,8 @@ const FormularioPerguntas = () => {
 
   const [respostas, setRespostas] = useState({});
   const [erro, setErro] = useState("");
-  const [showPopup, setShowPopup] = useState(false); // Adiciona o estado para o popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [usuarioId, setUsuarioId] = useState(null);
 
   const handleInputChange = (index, value) => {
     setRespostas((prev) => ({ ...prev, [index]: value }));
@@ -24,7 +25,6 @@ const FormularioPerguntas = () => {
     e.preventDefault();
     setErro("");
 
-    // Verifica se todas as perguntas têm resposta
     const respostasArray = perguntas.map((pergunta, index) => ({
       pergunta,
       resposta: respostas[index] || "",
@@ -36,8 +36,10 @@ const FormularioPerguntas = () => {
     }
 
     try {
-      const usuario_id = "2"; // Exemplo de ID do usuário (ajuste conforme necessário)
-      const response = await fetch(`http://localhost:4000/api/respostas/${usuario_id}`, {
+      const usuario_id = "2";
+      setUsuarioId(usuario_id);
+
+      const response = await fetch(`http://127.0.0.1:3333/api/respostas/${usuario_id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -47,7 +49,7 @@ const FormularioPerguntas = () => {
       });
 
       if (response.ok) {
-        setShowPopup(true); // Exibe o popup de sucesso
+        setShowPopup(true);
       } else {
         const errorData = await response.json();
         setErro(errorData.error || "Erro ao enviar respostas.");
@@ -60,7 +62,11 @@ const FormularioPerguntas = () => {
 
   const handlePopupClose = () => {
     setShowPopup(false);
-    navigate("/"); // Volta para a página inicial ao fechar o popup
+    if (usuarioId) {
+      window.location.href = `http://localhost:5173/?id=${usuarioId}`;
+    } else {
+      navigate("/");
+    }
   };
 
   return (
@@ -211,8 +217,8 @@ const FormularioPerguntas = () => {
             <button
               onClick={() => {
                 handlePopupClose(); // Fechar o popup
-                console.log("ID do usuário:", data.userId); 
-                window.location.href = `http://localhost:5173/?id=${data.userId}`;  // Redireciona para a página inicial (home)
+                console.log("ID do usuário:", usuarioId);
+                window.location.href = `http://localhost:5173/step9?id=${usuarioId}`;  // Redireciona para o step9
               }}
               style={{
                 padding: "8px 16px",

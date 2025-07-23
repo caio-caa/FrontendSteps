@@ -14,15 +14,16 @@ import {
   Heading,
   FormControl,
   FormLabel,
-  Center,
 } from "@chakra-ui/react";
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom"; // Importando useNavigate
 
 const LoginAdm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
+  const navigate = useNavigate(); // Instanciando o hook para navegação
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -43,7 +44,9 @@ const LoginAdm = () => {
         localStorage.setItem("token", data.token);
         setMessage("Login bem-sucedido!");
         console.log("Token recebido:", data.token);
-        window.location.href = "http://localhost:5173/";
+
+        // Redirecionando para a página Lista após o login
+        navigate("/Lista");
       } else {
         setMessage(data.error || "Erro ao fazer login");
         console.error("Erro na resposta do servidor:", data);
@@ -56,15 +59,9 @@ const LoginAdm = () => {
 
   return (
     <Box bg="#072AC8" minH="100vh" py={10} display="flex" justifyContent="center" alignItems="center">
-      <Container maxW="lg"> {/* Aumentei a largura do container para um layout mais largo */}
-        <Box
-          bg="whiteAlpha.300"
-          p={8}
-          borderRadius="20"
-          boxShadow="lg"
-          backdropFilter="blur(10px)"
-        >
-          <VStack spacing={8}> {/* Aumentei o espaçamento entre os campos */}
+      <Container maxW="lg">
+        <Box bg="whiteAlpha.300" p={8} borderRadius="20" boxShadow="lg" backdropFilter="blur(10px)">
+          <VStack spacing={8}>
             <Heading color="white" mb={6} textAlign="center" fontSize="28">
               Acesse o sistema de Administrador
             </Heading>
@@ -87,7 +84,7 @@ const LoginAdm = () => {
                   _placeholder={{ color: "whiteAlpha.700" }}
                   py={6}
                   px={4}
-                  w="100%" // Ajustei para 100% da largura
+                  w="100%"
                 />
               </InputGroup>
             </FormControl>
@@ -96,7 +93,7 @@ const LoginAdm = () => {
               <FormLabel color="white">Senha</FormLabel>
               <InputGroup>
                 <Input
-                  type={mostrarSenha ? 'text' : 'password'}
+                  type={mostrarSenha ? "text" : "password"}
                   placeholder="Senha"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -104,10 +101,10 @@ const LoginAdm = () => {
                   color="white"
                   border="2px solid rgba(255, 255, 255, 0.2)"
                   borderRadius="40px"
-                  _placeholder={{ color: 'whiteAlpha.700' }}
+                  _placeholder={{ color: "whiteAlpha.700" }}
                   py={6}
                   px={4}
-                  w="100%" // Ajustei para 100% da largura
+                  w="100%"
                 />
                 <InputRightElement h="full" pr={4}>
                   <IconButton
@@ -115,25 +112,17 @@ const LoginAdm = () => {
                     variant="ghost"
                     onClick={() => setMostrarSenha(!mostrarSenha)}
                     color="white"
-                    _hover={{ bg: 'whiteAlpha.200' }}
+                    _hover={{ bg: "whiteAlpha.200" }}
                   />
                 </InputRightElement>
               </InputGroup>
             </FormControl>
 
-            <Button
-              w="100%"  // Ajustei para 100% da largura
-              bg="white"
-              color="blue.600"
-              _hover={{ bg: "whiteAlpha.900" }}
-              onClick={handleSubmit}
-              borderRadius="40px"
-            >
+            <Button w="100%" bg="white" color="blue.600" _hover={{ bg: "whiteAlpha.900" }} onClick={handleSubmit} borderRadius="40px">
               Login
             </Button>
 
-            {message && <Text color="white" textAlign="center" mt={4}>{message}</Text>} {/* Exibição da mensagem de erro ou sucesso */}
-
+            {message && <Text color="white" textAlign="center" mt={4}>{message}</Text>}
           </VStack>
         </Box>
       </Container>

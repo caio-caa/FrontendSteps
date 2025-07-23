@@ -60,10 +60,14 @@ function InvestorReportView({ id, onBack }) {
     }
 
     try {
-      const response = await axios.get(`http://localhost:3000/formulario/${id}`);
-      console.log('Resposta da API:', response.data);
-      if (response.data) {
-        setDados(response.data);
+      const response = await axios.get(`http://127.0.0.1:3333/formulario/todos`);
+      const data = response.data;
+      
+      // Encontrando o item específico pelo ID
+      const item = data.find(entry => entry.id === id);
+      
+      if (item) {
+        setDados(item);
       } else {
         setError('Nenhum dado encontrado para este ID.');
       }
